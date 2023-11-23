@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_weather_app/constants/gaps.dart';
 import 'package:flutter_weather_app/constants/palette.dart';
 import 'package:flutter_weather_app/constants/paths.dart';
 import 'package:flutter_weather_app/model/weather.dart';
+import 'package:flutter_weather_app/service/api_service.dart';
 import 'package:flutter_weather_app/view/w_weather_lottie.dart';
+import 'package:lottie/lottie.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,12 +16,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // variable for weather data
   late Future<Weather> currentWeather;
 
   @override
   void initState() {
-    // fetch data here
+    currentWeather = ApiService.getCurrentWeather();
     super.initState();
   }
 
@@ -29,19 +31,84 @@ class _MainScreenState extends State<MainScreen> {
       body: FutureBuilder(
         future: currentWeather,
         builder: (context, snapshot) {
-          // Create widgets here
-          return const Placeholder();
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child:
+                  Lottie.asset("./assets/animations/loading.json", height: 80),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                children: [
+                  gap100h,
+                  Lottie.asset("./assets/animations/error.json", height: 200),
+                  Text(
+                    "Failed to load weather data",
+                    style: TextStyle(color: Palette.text),
+                  )
+                ],
+              ),
+            );
+          } else {
+            Weather weather = snapshot.data!;
+            return SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  children: [
+                    gap50h,
+                    Text(
+                      "Seoul",
+                      style: TextStyle(
+                        color: Palette.text,
+                        fontSize: 30,
+                      ),
+                    ),
+                    createWeatherAnimation(weather.main),
+                    Text(
+                      "${weather.desc} / ${weather.temp} ℃",
+                      style: TextStyle(
+                        color: Palette.text,
+                        fontSize: 20,
+                      ),
+                    ),
+                    gap20h,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          currentWeather = ApiService.getCurrentWeather();
+                        });
+                      },
+                      child: Container(
+                        width: 200,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Palette.point,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Refresh',
+                              style: TextStyle(
+                                color: Palette.text,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
         },
       ),
     );
   }
 
-// using this for test before implementing API call
-  Future<void> mockFetching() async {
-    await Future.delayed(const Duration(seconds: 1));
-  }
-
-// using this for create weather lottie widget
   Widget createWeatherAnimation(String param) {
     var url = "";
     switch (param) {

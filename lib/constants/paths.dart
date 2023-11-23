@@ -1,7 +1,6 @@
 class Paths {
   static const String loadingAnimation = "assets/animations/loading.json";
   static const String errorAnimation = "assets/animations/error.json";
-  // weather
   static const String clear = "assets/animations/weathers/clear.json";
   static const String atmosphere = "assets/animations/weathers/atmosphere.json";
   static const String drizzle = "assets/animations/weathers/rain.json";
