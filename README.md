@@ -1,5 +1,5 @@
 # weather-app
-COMIT 플러터 스터디 실습
+COMIT 플러터 스터디 실습2
 
 ### 새롭게 알게 된 점
 - API 호출 및 데이터 처리
